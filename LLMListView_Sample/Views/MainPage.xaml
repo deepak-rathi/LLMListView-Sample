@@ -1,0 +1,183 @@
+﻿<Page
+    x:Class="LLMListView_Sample.Views.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="using:LLMListView_Sample.Converters"
+    xmlns:LLM="using:LLM"
+    mc:Ignorable="d">
+
+    <!--#region Page Resources-->
+    <Page.Resources>
+        
+        <!--#region Converters-->
+        <converters:ValueWhenConverter x:Name="VisibleWhenTrueConverter">
+            <converters:ValueWhenConverter.When>
+                <x:Boolean>False</x:Boolean>
+            </converters:ValueWhenConverter.When>
+            <converters:ValueWhenConverter.Value>
+                <Visibility>Collapsed</Visibility>
+            </converters:ValueWhenConverter.Value>
+            <converters:ValueWhenConverter.Otherwise>
+                <Visibility>Visible</Visibility>
+            </converters:ValueWhenConverter.Otherwise>
+        </converters:ValueWhenConverter>
+        <converters:ValueWhenConverter x:Name="VisibleWhenFalseConverter">
+            <converters:ValueWhenConverter.When>
+                <x:Boolean>False</x:Boolean>
+            </converters:ValueWhenConverter.When>
+            <converters:ValueWhenConverter.Value>
+                <Visibility>Visible</Visibility>
+            </converters:ValueWhenConverter.Value>
+            <converters:ValueWhenConverter.Otherwise>
+                <Visibility>Collapsed</Visibility>
+            </converters:ValueWhenConverter.Otherwise>
+        </converters:ValueWhenConverter>
+        <!--#endregion Converters-->
+        
+        <!--#region DataTemplate-->
+        <DataTemplate x:Key="ListItemDataTemplate">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <StackPanel Padding="15" Grid.Row="0" HorizontalAlignment="Left">
+                    <TextBlock MaxLines="1" TextTrimming="CharacterEllipsis"
+                                   Text="{Binding Text1}" TextAlignment="Left"/>
+
+                    <TextBlock Text="{Binding Text2}" TextAlignment="Left"
+                               Foreground="DimGray" MaxLines="1" 
+                               TextTrimming="CharacterEllipsis"/>
+
+                    <TextBlock Text="{Binding Text3}" TextAlignment="Left"
+                               Foreground="DimGray" MaxLines="1"
+                               TextTrimming="CharacterEllipsis"/>
+
+                </StackPanel>
+                <Rectangle Grid.Row="1"
+                           Height="0.5"
+                           Fill="LightGray"
+                           VerticalAlignment="Bottom"
+                           HorizontalAlignment="Stretch"
+                           Margin="0" />
+            </Grid>
+        </DataTemplate>
+        <!--#endregion DataTempalte-->
+    </Page.Resources>
+    <!--#endregion Page Resources-->
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="440"/>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <LLM:LLMListView Grid.Column="0" Grid.RowSpan="2"
+                         ItemTemplate="{StaticResource ListItemDataTemplate}"
+                         ItemsSource="{Binding MyItemSource, Mode = OneWay, UpdateSourceTrigger=PropertyChanged}"
+                         SelectedItem="{Binding Selected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Background="#F9F9F9"
+                         HorizontalAlignment="Stretch"
+                         HorizontalContentAlignment ="Stretch"
+                         ReorderMode="Disabled"
+                         DataFetchSize="14" 
+                         CanPullToRefresh="False"
+                         IncrementalLoadingTrigger="Edge"
+                         ShowsScrollingPlaceholders="False"
+                         ItemLeftActionRateForSwipeLength="0.5"
+                         ItemLeftSwipeMaxLength="140"
+                         ItemRightActionRateForSwipeLength="0.5"
+                         ItemRightSwipeMaxLength="180"
+                         ItemRightSwipeMode="Fix"
+                         SelectionMode="Single"
+                         EnableSwipeLeftMemberPath="EnableSwipeLeft"
+                         EnableSwipeRightMemberPath="EnableSwipeRight"
+                         IsItemClickEnabled="True"
+                         IsSwipedLeftMemberPath="IsSwipedLeft"
+                         IsSwipedRightMemberPath="IsSwipedRight"
+                         ItemSwipeBeginTrigger="LLMListView_ItemSwipeBeginTrigger">
+            <!--#region ItemContainerStyle-->
+            <LLM:LLMListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="Padding" Value="0" />
+                </Style>
+            </LLM:LLMListView.ItemContainerStyle>
+            <!--#endregion ItemContainerStyle-->
+
+            <!--#region ItemLeftSwipeContentTempalte-->
+            <LLM:LLMListView.ItemLeftSwipeContentTemplate>
+                <DataTemplate>
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                            <Button Foreground="White" VerticalAlignment="Stretch" BorderThickness="0" Background="Gray">
+                                <TextBlock Text="Left Button" VerticalAlignment="Stretch" Padding="10" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </LLM:LLMListView.ItemLeftSwipeContentTemplate>
+            <!--#endregion ItemLeftSwipeContentTempalte-->
+
+            <!--#region ItemRightSwipeContentTemplate-->
+            <LLM:LLMListView.ItemRightSwipeContentTemplate>
+                <DataTemplate>
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+                        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                            <!--#region Button1-->
+                            <Button Foreground="White" VerticalAlignment="Stretch" BorderThickness="0" Background="#e74c3c" Visibility="{Binding IsVisible, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibleWhenTrueConverter}}" MaxWidth="100">
+                                <TextBlock  Padding="10" VerticalAlignment="Stretch" Text="Button 1" Style="{ThemeResource BodyTextBlockStyle}" TextAlignment="Center" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
+                            </Button>
+                            <!--#endregion Button1-->
+                            <!--#region Button2-->
+                            <Button Foreground="White" VerticalAlignment="Stretch" BorderThickness="0" Background="#1abc9c" Visibility="{Binding IsVisible, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibleWhenFalseConverter}}" MaxWidth="100">
+                                <TextBlock  Padding="10" VerticalAlignment="Stretch" Text="Button 2" Style="{ThemeResource BodyTextBlockStyle}" TextAlignment="Center" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
+                            </Button>
+                            <!--#endregion Button2-->
+                            <!--#region Button3-->
+                            <Button Foreground="White" VerticalAlignment="Stretch" BorderThickness="0" Background="#1abc9c" Visibility="{Binding IsVisible, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibleWhenTrueConverter}}" MaxWidth="100">
+                                <TextBlock  Padding="10" VerticalAlignment="Stretch" Text="Button 3" Style="{ThemeResource BodyTextBlockStyle}" TextAlignment="Center" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" />
+                            </Button>
+                            <!--#endregion Button3-->
+                        </StackPanel>
+
+                    </Grid>
+                </DataTemplate>
+            </LLM:LLMListView.ItemRightSwipeContentTemplate>
+            <!--#endregion ItemRightSwipeContentTemplate-->
+        </LLM:LLMListView>
+
+        <!--#region VerticalSeperator-->
+        <Rectangle Grid.Column="1"
+                   Grid.RowSpan="2"
+                   x:Name="VerticalSeperator"
+                   Fill="LightGray"
+                   VerticalAlignment="Stretch"
+                   HorizontalAlignment="Stretch"
+                   Width="0.5" />
+        <!--#endregion VerticalSeperator-->
+
+        <!--#region WideScreen-->
+        <Grid x:Name="WideScreen"
+              Grid.Row="1"
+              Grid.Column="2"
+              Padding="24,0,24,24"
+              Margin="5"
+              HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Selected item's Text1: " Grid.Column="0"/>
+            <TextBlock Text="{Binding Selected.Text1}" Grid.Column="1"/>
+        </Grid>
+        <!--#endregion WideScreen-->
+    </Grid>
+</Page>
